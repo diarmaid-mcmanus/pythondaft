@@ -1,11 +1,15 @@
 import requests
 import json
+import lxml.html
 
 
 class MapperInterface(object):
     """Scraper"""
 
-    def scrape_listing_images(self, path):
+    def __init__(self):
+        pass
+
+    def _scrape_listing_images(self, path):
         """Returns the images in a listing.
     
         stolen from https://github.com/Danm72/DaftPy"""
@@ -21,9 +25,9 @@ class MapperInterface(object):
     
         images = []
         for image in results:
-            url = image.get('data-original')
+            url = image.get('src')
             if url.startswith('//'):
-                url = 'http:' + url
+                url = 'https:' + url
     
             images.append(url)
     
@@ -76,9 +80,22 @@ class MapperInterface(object):
         data = []
         for daft_coordinates in self._divvy_up_ireland():
             json = self._make_request('sale', daft_coordinates['sw'], daft_coordinates['ne'])
+            for daft_property in json:
+                try:
+                    daft_property['images'] = self._scrape_listing_images(daft_property['link'])
+                except NoImageFound:
+                    daft_property['images'] = None
             data += json
         return data
     
+
+class NoImageFound(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
 
 if __name__=="__main__":
     scraper = MapperInterface()
