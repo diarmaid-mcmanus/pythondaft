@@ -2,6 +2,31 @@ import requests
 import json
 
 
+def scrape_listing_images(path):
+    """Returns the images in a listing.
+
+    stolen from https://github.com/Danm72/DaftPy"""
+    r = requests.get("http://www.daft.ie%s" % (path,))
+    if r.status_code is not 200:
+        raise Exception("Failed to scrape image for %s" % (path,))
+
+    tree = lxml.html.fromstring(r.text)
+    results = tree.cssselect('#pbxl_carousel ul li.pbxl_carousel_item img')
+
+    if len(results) < 1:
+        raise NoImageFound(path)
+
+    images = []
+    for image in results:
+        url = image.get('data-original')
+        if url.startswith('//'):
+            url = 'http:' + url
+
+        images.append(url)
+
+    return images_
+
+
 def generate_coordinates_for_url(sw, ne):
     """Take pair of lattitude and longitude and return a string."""
     # &sw=(51.93173528395185%2C+-10.03197265625)&ne=(55.031189853816535%2C+-5.59498046875)
