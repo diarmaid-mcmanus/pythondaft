@@ -6,8 +6,9 @@ import lxml.html
 class MapperInterface(object):
     """Scraper"""
 
-    def __init__(self):
-        pass
+    def __init__(self, coordinates_file='coordinates.json'):
+        self.coordinates_file = coordinates_file
+        
 
     def _scrape_listing_images(self, path):
         """Returns the images in a listing.
@@ -52,8 +53,7 @@ class MapperInterface(object):
     
     def _divvy_up_ireland(self):
         """Return a list of coordinates covering Ireland."""
-        # TODO replace coords.json file with config variable?
-        with open('coordinates.json') as data_file:
+        with open(self.coordinates_file) as data_file:
             data = json.load(data_file)
         return data
         
