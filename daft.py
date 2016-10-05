@@ -31,7 +31,8 @@ class MapperInterface(object):
     def _generate_url(self, action, property_type, sw, ne):
         """Return a valid daft.ie URL as a string."""
         base_url = 'http://www.daft.ie/ajax_endpoint.php?action='
-        extra_params = ('&extra_params={{"rent"%3A[0%2C50000000]%2C"beds"%3A[0%2C20]}}')
+        extra_params = ('&extra_params={{"rent"%3A[0%2C50000000]'
+                        '%2C"beds"%3A[0%2C20]}}')
         url = '{0}{1}&type={2}&sw=({3}%2C+{4})&ne=({5}%2C+{6}){7}'.format(
             base_url, action, property_type, sw[0], sw[1], ne[0], ne[1],
             extra_params)
