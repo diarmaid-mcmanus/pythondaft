@@ -34,21 +34,11 @@ class MapperInterface(object):
     
         return images
 
-    
-    def _generate_coordinates_for_url(self, sw, ne):
-        """Take pair of lattitude and longitude and return a string."""
-        # &sw=(51.93173528395185%2C+-10.03197265625)&ne=(55.031189853816535%2C+-5.59498046875)
-        southwest = '&sw=(' + sw[0] + '%2C+' + sw[1] + ')'
-        northeast = '&ne=(' + ne[0] + '%2C+' + ne[1] + ')'
-        return southwest + northeast
-    
     def _generate_url(self, action, property_type, sw, ne):
         """Return a valid daft.ie URL as a string."""
         base_url = 'http://www.daft.ie/ajax_endpoint.php?action='
-        url_type = '&type=' + property_type
-        url_coords = self._generate_coordinates_for_url(sw, ne)
         extra_params = '&extra_params=%7B%22rent%22%3A%5B0%2C50000000%5D%2C%22beds%22%3A%5B0%2C20%5D%7D'
-        url = base_url + action + url_type + url_coords + extra_params
+        url = '{0}{1}&type={2}&sw=({3}%2C+{4})&ne=({5}%2C+{6}){7}'.format(base_url, action, property_type, sw[0], sw[1], ne[0], ne[1], extra_params)
         return url
     
     def _divvy_up_ireland(self):
