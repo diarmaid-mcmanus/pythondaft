@@ -31,8 +31,7 @@ class MapperInterface(object):
     def _generate_url(self, action, property_type, sw, ne):
         """Return a valid daft.ie URL as a string."""
         base_url = 'http://www.daft.ie/ajax_endpoint.php?action='
-        extra_params = ('&extra_params=%7B%22rent%22%3A%5B0%2C50000000%5D%2C'
-                        '%22beds%22%3A%5B0%20%5D%7D')
+        extra_params = ('&extra_params={{"rent"%3A[0%2C50000000]%2C"beds"%3A[0%2C20]}}')
         url = '{0}{1}&type={2}&sw=({3}%2C+{4})&ne=({5}%2C+{6}){7}'.format(
             base_url, action, property_type, sw[0], sw[1], ne[0], ne[1],
             extra_params)
@@ -45,10 +44,10 @@ class MapperInterface(object):
         return data
 
     def _make_request(self, property_type, sw, ne):
-        sw[0] += (".0000000")
-        sw[1] += (".0000000")
-        ne[0] += (".0000000")
-        ne[1] += (".0000000")
+        sw[0] += (".03173528395185")
+        sw[1] += (".03197265625")
+        ne[0] += (".031189853816535")
+        ne[1] += (".59498046875")
         url = self._generate_url('map_nearby_properties', property_type,
                                  sw, ne)
         properties = requests.get(url)
