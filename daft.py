@@ -9,7 +9,7 @@ class MapperInterface(object):
     def __init__(self, coordinates_file='coordinates.json'):
         self.coordinates_file = coordinates_file
 
-    def _scrape_listing_images(self, path):
+    def _get_listing_images(self, path):
         """Returns the images in a listing.
 
         stolen from https://github.com/Danm72/DaftPy"""
@@ -31,9 +31,11 @@ class MapperInterface(object):
     def _generate_url(self, action, property_type, sw, ne):
         """Return a valid daft.ie URL as a string."""
         base_url = 'http://www.daft.ie/ajax_endpoint.php?action='
-        extra_params = 
-        '&extra_params=%7B%22rent%22%3A%5B0%2C50000000%5D%2C%22beds%22%3A%5B0%20%5D%7D'
-        url = '{0}{1}&type={2}&sw=({3}%2C+{4})&ne=({5}%2C+{6}){7}'.format(base_url, action, property_type, sw[0], sw[1], ne[0], ne[1], extra_params)
+        extra_params = ('&extra_params=%7B%22rent%22%3A%5B0%2C50000000%5D%2C'
+                        '%22beds%22%3A%5B0%20%5D%7D')
+        url = '{0}{1}&type={2}&sw=({3}%2C+{4})&ne=({5}%2C+{6}){7}'.format(
+            base_url, action, property_type, sw[0], sw[1], ne[0], ne[1],
+            extra_params)
         return url
 
     def _divvy_up_ireland(self):
@@ -47,7 +49,8 @@ class MapperInterface(object):
         sw[1] += (".0000000")
         ne[0] += (".0000000")
         ne[1] += (".0000000")
-        url = self._generate_url('map_nearby_properties', property_type, sw, ne)
+        url = self._generate_url('map_nearby_properties', property_type,
+                                 sw, ne)
         properties = requests.get(url)
         return properties.json()
 
@@ -61,13 +64,13 @@ class MapperInterface(object):
     def get_all_properties_for_sale(self):
         """Return a collection of all properties for sale in Ireland."""
         data = []
-        for daft_coordinates in self._divvy_up_ireland():
-            json = self._make_request('sale', daft_coordinates['sw'], daft_coordinates['ne'])
-            for daft_property in json:
+        for coords in self._divvy_up_ireland():
+            json = self._make_request('sale', coords['sw'], coords['ne'])
+            for abode in json:
                 try:
-                    daft_property['images'] = self._scrape_listing_images(daft_property['link'])
+                    abode['images'] = self._get_listing_images(abode['link'])
                 except NoImageFound:
-                    daft_property['images'] = None
+                    abode['images'] = None
             data += json
         return data
 
