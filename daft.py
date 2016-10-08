@@ -1,4 +1,4 @@
-import ConfigParser
+from configparser import ConfigParser
 import requests
 import json
 import lxml.html
@@ -88,7 +88,7 @@ class NoImageFound(Exception):
 
 if __name__ == "__main__":
     # load config with default defaults
-    config = ConfigParser.SafeConfigParser(
+    config = ConfigParser(
                         {'coordinates_file': 'coordinates.json',
                          'eshost': 'localhost',
                          'esport': '9200'})
