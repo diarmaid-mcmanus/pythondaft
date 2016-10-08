@@ -1,12 +1,15 @@
+import ConfigParser
 import requests
 import json
 import lxml.html
+from elasticsearch import Elasticsearch
 
 
 class MapperInterface(object):
     """Scraper"""
 
     def __init__(self, coordinates_file='coordinates.json'):
+        self.es = Elasticsearch()
         self.coordinates_file = coordinates_file
 
     def _get_listing_images(self, path):
@@ -84,7 +87,18 @@ class NoImageFound(Exception):
 
 
 if __name__ == "__main__":
-    scraper = MapperInterface()
-    all_properties = scraper.get_all_properties_for_sale()
-    output = open('outputfile', "w")
-    output.write(str(all_properties))
+    # load config with default defaults
+    config = ConfigParser.SafeConfigParser(
+                        {'coordinates_file': 'coordinates.json',
+                         'eshost': 'localhost',
+                         'esport': '9200'})
+    config.readfp(open('daft.cfg'))
+    coordinates_file = config.get('daftconfig', 'coordinates_file')
+    eshost = config.get('daftconfig', 'eshost')
+    esport = config.get('daftconfig', 'esport')
+
+    scraper = MapperInterface(coordinates_file)
+    abodes = scraper.get_all_properties_for_sale()
+    es = Elasticsearch({'host': eshost, 'port': esport})
+    for abode in abodes:
+        es.index(index="daft-properties", doc_type='daft_listing', body=abode)
